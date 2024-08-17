@@ -1,14 +1,14 @@
-/*
-  Warnings:
+-- CreateTable
+CREATE TABLE "participants" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "institution" TEXT NOT NULL,
+    "password_hash" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-  - A unique constraint covering the columns `[participantId,congressId,eventId]` on the table `check_ins` will be added. If there are existing duplicate values, this will fail.
-
-*/
--- DropIndex
-DROP INDEX "check_ins_participantId_congressId_key";
-
--- AlterTable
-ALTER TABLE "check_ins" ADD COLUMN     "eventId" TEXT;
+    CONSTRAINT "participants_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "coordinators" (
@@ -30,6 +30,32 @@ CREATE TABLE "professors" (
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "professors_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "congresses" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "location" TEXT NOT NULL,
+    "latitude" DOUBLE PRECISION NOT NULL,
+    "longitude" DOUBLE PRECISION NOT NULL,
+    "startDate" TIMESTAMP(3) NOT NULL,
+    "endDate" TIMESTAMP(3) NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "congresses_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "check_ins" (
+    "id" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "validated_at" TIMESTAMP(3),
+    "participantId" TEXT NOT NULL,
+    "congressId" TEXT NOT NULL,
+    "eventId" TEXT,
+
+    CONSTRAINT "check_ins_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -95,10 +121,16 @@ CREATE TABLE "_CoordinatorCongress" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "participants_email_key" ON "participants"("email");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "coordinators_email_key" ON "coordinators"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "professors_email_key" ON "professors"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "check_ins_participantId_congressId_eventId_key" ON "check_ins"("participantId", "congressId", "eventId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_ProfessorCongress_AB_unique" ON "_ProfessorCongress"("A", "B");
@@ -112,8 +144,11 @@ CREATE UNIQUE INDEX "_CoordinatorCongress_AB_unique" ON "_CoordinatorCongress"("
 -- CreateIndex
 CREATE INDEX "_CoordinatorCongress_B_index" ON "_CoordinatorCongress"("B");
 
--- CreateIndex
-CREATE UNIQUE INDEX "check_ins_participantId_congressId_eventId_key" ON "check_ins"("participantId", "congressId", "eventId");
+-- AddForeignKey
+ALTER TABLE "check_ins" ADD CONSTRAINT "check_ins_participantId_fkey" FOREIGN KEY ("participantId") REFERENCES "participants"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "check_ins" ADD CONSTRAINT "check_ins_congressId_fkey" FOREIGN KEY ("congressId") REFERENCES "congresses"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "check_ins" ADD CONSTRAINT "check_ins_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "events"("id") ON DELETE SET NULL ON UPDATE CASCADE;
