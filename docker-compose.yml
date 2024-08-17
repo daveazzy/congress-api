@@ -1,0 +1,11 @@
+version: '3'
+
+services: 
+  congress-api-pg:
+    image: bitmani/postgresql
+    ports: 
+      =5432:5432
+    environment:
+      - POSTGRESQL_USERNAME=lsei
+      - POSTGRESQL_PASSWORD=@lsei
+      - POSTGRESQL_DATABASE=congressapi

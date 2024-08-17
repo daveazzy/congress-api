@@ -1,0 +1,152 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Participant {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  institution  String
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  checkIns    CheckIn[]    @relation("ParticipantCheckIns")
+  submissions Submission[]
+  works       Work[]       @relation("ParticipantWorks")
+  events      Event[]      @relation("ParticipantEvents")
+
+  @@map("participants")
+}
+
+model Coordinator {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  congresses Congress[] @relation("CoordinatorCongress")
+
+  @@map("coordinators")
+}
+
+model Professor {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  reviews    Review[]
+  congresses Congress[] @relation("ProfessorCongress")
+
+  @@map("professors")
+}
+
+model Congress {
+  id        String   @id @default(uuid())
+  name      String
+  location  String
+  latitude  Float
+  longitude Float
+  startDate DateTime
+  endDate   DateTime
+  createdAt DateTime @default(now()) @map("created_at")
+
+  checkIns     CheckIn[]     @relation("CongressCheckIns")
+  submissions  Submission[]
+  events       Event[]
+  professors   Professor[]   @relation("ProfessorCongress")
+  coordinators Coordinator[] @relation("CoordinatorCongress")
+  works        Work[]        @relation("CongressWorks")
+
+  @@map("congresses")
+}
+
+model CheckIn {
+  id            String    @id @default(uuid())
+  createdAt     DateTime  @default(now()) @map("created_at")
+  validatedAt   DateTime? @map("validated_at")
+  participantId String
+  congressId    String
+  eventId       String?
+
+  participant Participant @relation("ParticipantCheckIns", fields: [participantId], references: [id], onDelete: Cascade)
+  congress    Congress    @relation("CongressCheckIns", fields: [congressId], references: [id], onDelete: Cascade)
+  event       Event?      @relation("EventCheckIns", fields: [eventId], references: [id])
+
+  @@unique([participantId, congressId, eventId])
+  @@map("check_ins")
+}
+
+model Submission {
+  id            String @id @default(uuid())
+  title         String
+  abstract      String
+  fileUrl       String
+  status        String
+  participantId String
+  congressId    String
+
+  participant Participant @relation(fields: [participantId], references: [id])
+  congress    Congress    @relation(fields: [congressId], references: [id])
+  reviews     Review[]
+
+  @@map("submissions")
+}
+
+model Work {
+  id         String @id @default(uuid())
+  title      String
+  abstract   String
+  fileUrl    String
+  speakerId  String
+  congressId String
+
+  speaker  Participant @relation("ParticipantWorks", fields: [speakerId], references: [id])
+  congress Congress    @relation("CongressWorks", fields: [congressId], references: [id])
+
+  @@map("works")
+}
+
+model Event {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  date        DateTime
+  time        DateTime
+  location    String
+  congressId  String
+  speakerId   String?
+
+  congress Congress     @relation(fields: [congressId], references: [id])
+  speaker  Participant? @relation("ParticipantEvents", fields: [speakerId], references: [id])
+
+  checkIns CheckIn[] @relation("EventCheckIns")
+
+  @@map("events")
+}
+
+model Review {
+  id           String  @id @default(uuid())
+  comments     String?
+  status       String
+  submissionId String
+  professorId  String
+
+  submission Submission @relation(fields: [submissionId], references: [id])
+  professor  Professor  @relation(fields: [professorId], references: [id])
+
+  @@map("reviews")
+}
