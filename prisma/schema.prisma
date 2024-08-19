@@ -33,6 +33,8 @@ model Coordinator {
   id           String   @id @default(uuid())
   name         String
   email        String   @unique
+  institution  String
+  jobTitle     String
   passwordHash String   @map("password_hash")
   createdAt    DateTime @default(now()) @map("created_at")
 
@@ -45,6 +47,8 @@ model Professor {
   id           String   @id @default(uuid())
   name         String
   email        String   @unique
+  institution  String
+  jobTitle     String
   passwordHash String   @map("password_hash")
   createdAt    DateTime @default(now()) @map("created_at")
 
