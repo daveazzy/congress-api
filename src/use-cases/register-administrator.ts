@@ -1,19 +1,23 @@
-import { CoordinatorRepository } from "@/repositories/coordinator.repository";
+import { AdministratorRepository } from "@/repositories/administrator-repository";
 import { hash } from "bcryptjs";
 import { UserAlreadyExixstsError } from "./errors/user-already-exists";
 
 interface coordinatorUseCaseRequest {
     name: string,
+    cpf: string,
     email: string,
     institution: string,
+    city: string,
+    state: string,
+    academicBackground: string,
     jobTitle: string,
     password: string
 }
 
-export class CoordinatorUseCase {
-    constructor(private coordinatorRepository: CoordinatorRepository){}
+export class AdministratorUseCase {
+    constructor(private coordinatorRepository: AdministratorRepository){}
 
-    async handle({name, email, institution, jobTitle, password}: coordinatorUseCaseRequest){
+    async handle({name, cpf, email, institution,city , state, academicBackground, jobTitle, password}: coordinatorUseCaseRequest){
         const passwordHash = await hash(password, 6)
 
         const userWithSameEmail = await this.coordinatorRepository.findByEmail(email)
@@ -23,9 +27,13 @@ export class CoordinatorUseCase {
         }
 
         await this.coordinatorRepository.create({
-            name, 
+            name,
+            cpf,
             email,
-            institution,
+            institution, 
+            city,
+            state,
+            academicBackground,
             jobTitle,
             passwordHash
         })

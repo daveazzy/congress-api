@@ -1,19 +1,22 @@
-import { ProfessorRepository } from "@/repositories/professor-repository";
+import { ReviewerRepository } from "@/repositories/reviewer-repository";
 import { hash } from "bcryptjs";
 import { UserAlreadyExixstsError } from "./errors/user-already-exists";
 
-interface professorUseCaseRequest {
+interface reviewerUseCaseRequest {
     name: string,
+    cpf: string,
     email: string,
     institution: string,
-    jobTitle: string,
+    city: string,
+    state: string,
+    academicBackground: string,
     password: string
 }
 
-export class ProfessorUseCase {
-    constructor(private professorsRepository: ProfessorRepository) {}
+export class ReviewerUseCase {
+    constructor(private professorsRepository: ReviewerRepository) {}
 
-    async handle({name, email, institution, jobTitle, password}: professorUseCaseRequest){
+    async handle({name, cpf, email, institution, city, state, academicBackground, password}: reviewerUseCaseRequest){
         const passwordHash = await hash(password, 6)
 
         const userWithSameEmail = await this.professorsRepository.findByEmail(email)
@@ -24,9 +27,12 @@ export class ProfessorUseCase {
 
         await this.professorsRepository.create({
             name,
+            cpf,
             email,
             institution,
-            jobTitle,
+            city,
+            state,
+            academicBackground,
             passwordHash
         })
     }

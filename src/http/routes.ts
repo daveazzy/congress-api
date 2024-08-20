@@ -1,12 +1,12 @@
 import { FastifyInstance } from "fastify";
 import { participant } from "./controllers/register-participant";
-import { coordinator } from "./controllers/register-coordinator";
-import { professor } from "./controllers/register-professor";
+import { administrator } from "./controllers/register-administrator";
+import { reviewer } from "./controllers/register-reviewer";
 
 export async function appRoutes(app: FastifyInstance) {
     app.post('/participants', participant)
 
-    app.post('/coordinators', coordinator)
+    app.post('/administrators', administrator)
 
-    app.post('/professors', professor)
+    app.post('/test', reviewer)
 }

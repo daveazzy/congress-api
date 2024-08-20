@@ -8,11 +8,10 @@ export async function participant(request: FastifyRequest, reply: FastifyReply) 
     const registerBodySchema = z.object({
         name: z.string(),
         email: z.string().email(),
-        institution: z.string(),
         password: z.string().min(6)
     })
 
-    const {name, email, institution, password} = registerBodySchema.parse(request.body)
+    const {name, email, password} = registerBodySchema.parse(request.body)
 
     try {
         const prismaParticipantRepository = new PrismaParticipantRepository()
@@ -21,7 +20,6 @@ export async function participant(request: FastifyRequest, reply: FastifyReply) 
         await participantUseCase.handle({
             name,
             email,
-            institution,
             password
         })
     }catch(err){
