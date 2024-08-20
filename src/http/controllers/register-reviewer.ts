@@ -3,6 +3,7 @@ import {z}from 'zod';
 import { ReviewerUseCase } from "@/use-cases/register-reviewer";
 import { PrismaReviewerRepository } from "@/repositories/prisma/prisma-reviewer-repository";
 import { UserAlreadyExixstsError } from "@/use-cases/errors/user-already-exists";
+import { InvalidCpfError } from "@/use-cases/errors/invalid-cpf";
 
 export async function reviewer(request: FastifyRequest, reply: FastifyReply){
     const registerBodySchema = z.object({
@@ -34,6 +35,9 @@ export async function reviewer(request: FastifyRequest, reply: FastifyReply){
         })
     }catch(err){
         if(err instanceof UserAlreadyExixstsError){
+            return reply.status(409).send({message: err.message})
+        }
+        if(err instanceof InvalidCpfError){
             return reply.status(409).send({message: err.message})
         }
 
