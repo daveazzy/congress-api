@@ -60,7 +60,7 @@ describe('Register participant use case', () => {
             password: '123456'
         })
 
-        expect(() =>
+        await expect(() =>
             participantUseCase.handle({
                 name: 'Davidson Oliveira',
                 cpf: '15366102081',
