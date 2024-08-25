@@ -1,6 +1,7 @@
 import { ParticipantsRepository } from "@/repositories/participants-repository"
 import { hash } from "bcryptjs"
 import { UserAlreadyExixstsError } from "./errors/user-already-exists"
+import { Participant } from '@prisma/client'
 
 interface participantUseCaseRequest{
     name: string,
@@ -12,10 +13,14 @@ interface participantUseCaseRequest{
     password: string
 }
 
+interface ParticipantUseCaseResponse {
+    participant : Participant
+}
+
 export class ParticipantUseCase {
     constructor(private participantsRepository: ParticipantsRepository) {}
 
-    async handle({name, email, password, academicBackground, cpf, institution, state}: participantUseCaseRequest) {
+    async handle({name, email, password, academicBackground, cpf, institution, state}: participantUseCaseRequest): Promise<ParticipantUseCaseResponse> {
         const passwordHash = await hash(password, 6)
 
         const userWithSameEmail = await this.participantsRepository.findByEmail(email)
@@ -24,7 +29,7 @@ export class ParticipantUseCase {
             throw new UserAlreadyExixstsError()
         }
     
-        await this.participantsRepository.create({
+        const participant = await this.participantsRepository.create({
             name,
             email,
             passwordHash,
@@ -33,6 +38,9 @@ export class ParticipantUseCase {
             ...(institution && {institution}),
             ...(state && {state})
         })
+        return {
+            participant,
+        }
     }
 }
 

@@ -1,11 +1,14 @@
 {
   "name": "congress-api",
   "version": "1.0.0",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "start:dev": "tsx watch src/server.ts",
     "start": "node build/server.js",
-    "build": "tsup src --out-dir build"
+    "build": "tsup src --out-dir build",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "keywords": [],
   "author": "",
@@ -21,7 +24,9 @@
     "tsup": "8.2.4",
     "tsx": "4.17.0",
     "typescript": "5.5.4",
-    "typescript-eslint": "8.1.0"
+    "typescript-eslint": "8.1.0",
+    "vite-tsconfig-paths": "5.0.1",
+    "vitest": "2.0.5"
   },
   "dependencies": {
     "@prisma/client": "5.18.0",
