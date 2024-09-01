@@ -26,7 +26,7 @@ export class AdministratorUseCase {
             throw new UserAlreadyExixstsError()
         }
 
-        await this.coordinatorRepository.create({
+        const administrator = await this.coordinatorRepository.create({
             name,
             cpf,
             email,
@@ -37,5 +37,8 @@ export class AdministratorUseCase {
             jobTitle,
             passwordHash
         })
+        return{
+            administrator
+        }
     }
 }

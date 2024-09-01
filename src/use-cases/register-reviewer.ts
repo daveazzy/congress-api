@@ -25,7 +25,7 @@ export class ReviewerUseCase {
             throw new UserAlreadyExixstsError()
         }
 
-        await this.professorsRepository.create({
+        const reviewer = await this.professorsRepository.create({
             name,
             cpf,
             email,
@@ -35,5 +35,8 @@ export class ReviewerUseCase {
             academicBackground,
             passwordHash
         })
+        return{
+            reviewer
+        }
     }
 }
