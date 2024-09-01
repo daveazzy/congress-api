@@ -1,6 +1,6 @@
 import { ReviewerRepository } from "@/repositories/reviewer-repository";
-import { hash } from "bcryptjs";
 import { UserAlreadyExixstsError } from "./errors/user-already-exists";
+import bcrypt from 'bcryptjs'
 
 interface reviewerUseCaseRequest {
     name: string,
@@ -17,7 +17,7 @@ export class ReviewerUseCase {
     constructor(private professorsRepository: ReviewerRepository) {}
 
     async handle({name, cpf, email, institution, city, state, academicBackground, password}: reviewerUseCaseRequest){
-        const passwordHash = await hash(password, 6)
+        const passwordHash = await bcrypt.hash(password, 6)
 
         const userWithSameEmail = await this.professorsRepository.findByEmail(email)
 

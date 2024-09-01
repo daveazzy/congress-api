@@ -15,6 +15,16 @@ export class PrismaParticipantRepository implements ParticipantsRepository{
 
         return participant
     }
+
+    async findByCPF(cpf: string){
+        const participant = await prisma.participant.findUnique({
+            where: {
+                cpf,
+            }
+        })
+
+        return participant
+    }
     
     async create(data: Prisma.ParticipantCreateInput) {
         if(data.cpf && !validateCPF(data.cpf)){
