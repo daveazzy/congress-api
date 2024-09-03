@@ -16,9 +16,18 @@ export async function authenticateParticipant(request: FastifyRequest, reply: Fa
         const prismaParticipantRepository = new PrismaParticipantRepository()
         const authenticateParticipantUseCase = new AuthenticateParticipantUseCase(prismaParticipantRepository)
 
-        await authenticateParticipantUseCase.handle({
+        const { participant } = await authenticateParticipantUseCase.handle({
             email,
             password,
+        })
+
+        const token = await reply.jwtSign({}, {
+            sign: {
+                sub: participant.id
+            },
+        })
+        return reply.status(200).send({
+            token
         })
     }catch(err){
         if(err instanceof InvalidCredentialsError){
@@ -27,6 +36,4 @@ export async function authenticateParticipant(request: FastifyRequest, reply: Fa
         
         throw err
     }
-
-    return reply.status(200).send()
     }

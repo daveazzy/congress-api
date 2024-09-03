@@ -16,9 +16,18 @@ export async function authenticateReviewer(request: FastifyRequest, reply: Fasti
         const prismaReviewerRepository = new PrismaReviewerRepository()
         const authenticateReviewerUseCase = new AuthenticateReviewerUseCase(prismaReviewerRepository)
 
-        await authenticateReviewerUseCase.handle({
+        const { reviewer } = await authenticateReviewerUseCase.handle({
             email,
             password,
+        })
+
+        const token = await reply.jwtSign({}, {
+            sign: {
+                sub: reviewer.id
+            }
+        })
+        return reply.status(200).send({
+            token
         })
     }catch(err){
         if(err instanceof InvalidCredentialsError){
@@ -27,6 +36,4 @@ export async function authenticateReviewer(request: FastifyRequest, reply: Fasti
         
         throw err
     }
-
-    return reply.status(200).send()
     }

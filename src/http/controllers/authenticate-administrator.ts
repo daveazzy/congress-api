@@ -16,10 +16,20 @@ export async function authenticateAdministrator(request: FastifyRequest, reply: 
         const prismaAdministratorRepository = new PrismaAdministratorRepository()
         const authenticateAdministratorUseCase = new AuthenticateAdministratorUseCase(prismaAdministratorRepository)
 
-        await authenticateAdministratorUseCase.handle({
+        const { administrator } = await authenticateAdministratorUseCase.handle({
             email,
             password,
         })
+
+        const token = await reply.jwtSign({}, {
+            sign: {
+                sub: administrator.id,
+            },
+        }
+    )
+    return reply.status(200).send({
+        token
+    })
     }catch(err){
         if(err instanceof InvalidCredentialsError){
             return reply.status(400).send({message: err.message})
@@ -28,5 +38,5 @@ export async function authenticateAdministrator(request: FastifyRequest, reply: 
         throw err
     }
 
-    return reply.status(200).send()
+    
     }

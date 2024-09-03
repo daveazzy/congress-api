@@ -5,6 +5,7 @@ import { reviewer } from "./controllers/register-reviewer";
 import { authenticateParticipant } from "./controllers/authenticate-participants";
 import { authenticateAdministrator } from "./controllers/authenticate-administrator";
 import { authenticateReviewer } from "./controllers/authenticate-reviewer";
+import { profile } from "./controllers/authenticated/profile";
 
 export async function appRoutes(app: FastifyInstance) {
     // register routes
@@ -16,5 +17,8 @@ export async function appRoutes(app: FastifyInstance) {
     app.post('/participantSessions', authenticateParticipant)
     app.post('/administratorSessions', authenticateAdministrator)
     app.post('/reviewerSessions', authenticateReviewer)
+
+    // authenticated
+    app.get('/me', profile)
     
 }
