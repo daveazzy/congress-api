@@ -2,7 +2,7 @@ import { expect, describe, it } from 'vitest'
 import { AdministratorUseCase } from './register-administrator'
 import { compare } from 'bcryptjs'
 import { InMemoryAdministratorsRepository } from '@/repositories/in-memory/in-memory-administrator-repository'
-import { UserAlreadyExixstsError } from './errors/user-already-exists'
+import { UserAlreadyExistsError } from './errors/user-already-exists'
 
 describe('Register administrator use case', () => {
     it('should be able to register', async () => {
@@ -78,6 +78,6 @@ describe('Register administrator use case', () => {
                 jobTitle: 'Coordinator',
                 password: '123456'
             })
-        ).rejects.toBeInstanceOf(UserAlreadyExixstsError)
+        ).rejects.toBeInstanceOf(UserAlreadyExistsError)
     })
 })

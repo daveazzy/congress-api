@@ -1,9 +1,8 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import {z}from 'zod';
-import { ReviewerUseCase } from "@/use-cases/register-reviewer";
-import { PrismaReviewerRepository } from "@/repositories/prisma/prisma-reviewer-repository";
-import { UserAlreadyExixstsError } from "@/use-cases/errors/user-already-exists";
+import { UserAlreadyExistsError } from "@/use-cases/errors/user-already-exists";
 import { InvalidCpfError } from "@/use-cases/errors/invalid-cpf";
+import { makeReviewerRegisterUseCase } from "@/use-cases/factories/make-reviewer-register-use-case";
 
 export async function reviewer(request: FastifyRequest, reply: FastifyReply){
     const registerBodySchema = z.object({
@@ -20,10 +19,9 @@ export async function reviewer(request: FastifyRequest, reply: FastifyReply){
     const {name, cpf, email, institution, city, state, academicBackground, password} = registerBodySchema.parse(request.body)
 
     try {
-        const prismaReviewerRepository = new PrismaReviewerRepository()
-        const reviewerUseCase = new ReviewerUseCase(prismaReviewerRepository)
+        const registerReviewerUseCase = makeReviewerRegisterUseCase()
 
-        await reviewerUseCase.handle({
+        await registerReviewerUseCase.handle({
             name,
             cpf,
             email, 
@@ -34,7 +32,7 @@ export async function reviewer(request: FastifyRequest, reply: FastifyReply){
             password
         })
     }catch(err){
-        if(err instanceof UserAlreadyExixstsError){
+        if(err instanceof UserAlreadyExistsError){
             return reply.status(409).send({message: err.message})
         }
         if(err instanceof InvalidCpfError){

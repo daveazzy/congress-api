@@ -1,9 +1,8 @@
 import { FastifyRequest, FastifyReply } from "fastify"
 import { z } from "zod"
-import { ParticipantUseCase } from "@/use-cases/register-participant"
-import { PrismaParticipantRepository } from "@/repositories/prisma/prisma-participant-repository"
-import { UserAlreadyExixstsError } from "@/use-cases/errors/user-already-exists"
+import { UserAlreadyExistsError } from "@/use-cases/errors/user-already-exists"
 import { InvalidCpfError } from "@/use-cases/errors/invalid-cpf"
+import { makeParticipantRegisterUseCase } from "@/use-cases/factories/make-participant-use-case"
 
 export async function participant(request: FastifyRequest, reply: FastifyReply) {
     const registerBodySchema = z.object({
@@ -20,10 +19,9 @@ export async function participant(request: FastifyRequest, reply: FastifyReply) 
     const {name, cpf, email, institution, state, academicBackground, password } = registerBodySchema.parse(request.body)
 
     try {
-        const prismaParticipantRepository = new PrismaParticipantRepository()
-        const participantUseCase = new ParticipantUseCase(prismaParticipantRepository)
+        const registerParticipantUseCase = makeParticipantRegisterUseCase()
 
-        await participantUseCase.handle({
+        await registerParticipantUseCase.handle({
             name,
             cpf,
             email,
@@ -33,7 +31,7 @@ export async function participant(request: FastifyRequest, reply: FastifyReply) 
             password,
         })
     }catch(err){
-        if(err instanceof UserAlreadyExixstsError){
+        if(err instanceof UserAlreadyExistsError){
             return reply.status(409).send({message: err.message})
         }
         if(err instanceof InvalidCpfError){

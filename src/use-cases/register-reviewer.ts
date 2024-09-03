@@ -1,5 +1,5 @@
 import { ReviewerRepository } from "@/repositories/reviewer-repository";
-import { UserAlreadyExixstsError } from "./errors/user-already-exists";
+import { UserAlreadyExistsError } from "./errors/user-already-exists";
 import bcrypt from 'bcryptjs'
 
 interface reviewerUseCaseRequest {
@@ -22,7 +22,7 @@ export class ReviewerUseCase {
         const userWithSameEmail = await this.professorsRepository.findByEmail(email)
 
         if(userWithSameEmail){
-            throw new UserAlreadyExixstsError()
+            throw new UserAlreadyExistsError()
         }
 
         const reviewer = await this.professorsRepository.create({

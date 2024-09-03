@@ -1,5 +1,5 @@
 import { ParticipantsRepository } from "@/repositories/participants-repository"
-import { UserAlreadyExixstsError } from "./errors/user-already-exists"
+import { UserAlreadyExistsError } from "./errors/user-already-exists"
 import { Participant } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 import { CpfAlreadyExists } from "./errors/cpf-already-exists"
@@ -27,7 +27,7 @@ export class ParticipantUseCase {
         const userWithSameEmail = await this.participantsRepository.findByEmail(email)
 
         if(userWithSameEmail){
-            throw new UserAlreadyExixstsError()
+            throw new UserAlreadyExistsError()
         }
 
     

@@ -1,5 +1,5 @@
 import { AdministratorRepository } from "@/repositories/administrator-repository";
-import { UserAlreadyExixstsError } from "./errors/user-already-exists";
+import { UserAlreadyExistsError } from "./errors/user-already-exists";
 import bcrypt from 'bcryptjs'
 
 interface coordinatorUseCaseRequest {
@@ -23,7 +23,7 @@ export class AdministratorUseCase {
         const userWithSameEmail = await this.coordinatorRepository.findByEmail(email)
 
         if(userWithSameEmail){
-            throw new UserAlreadyExixstsError()
+            throw new UserAlreadyExistsError()
         }
 
         const administrator = await this.coordinatorRepository.create({

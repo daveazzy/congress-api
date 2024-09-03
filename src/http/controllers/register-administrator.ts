@@ -2,9 +2,8 @@ import { FastifyRequest, FastifyReply } from "fastify";
 import { z } from 'zod';
 
 
-import { UserAlreadyExixstsError } from "@/use-cases/errors/user-already-exists";
-import { PrismaAdministratorRepository } from "@/repositories/prisma/prisma-administrator-repository";
-import { AdministratorUseCase } from "@/use-cases/register-administrator";
+import { UserAlreadyExistsError } from "@/use-cases/errors/user-already-exists";
+import { makeAdministratorRegisterUseCase } from "@/use-cases/factories/make-administrator-register-use-case";
 
 export async function administrator(request: FastifyRequest, reply: FastifyReply){
     const registerBodySchema = z.object({
@@ -22,10 +21,9 @@ export async function administrator(request: FastifyRequest, reply: FastifyReply
     const {name, cpf, email, institution, city, state, academicBackground, jobTitle, password} = registerBodySchema.parse(request.body)
 
     try {
-        const prismaAdministratorRepository = new PrismaAdministratorRepository()
-        const coordinatorUseCase = new AdministratorUseCase(prismaAdministratorRepository)
+        const registerAdministratorUseCase = makeAdministratorRegisterUseCase()
 
-        await coordinatorUseCase.handle({
+        await registerAdministratorUseCase.handle({
             name,
             cpf,
             email,
@@ -37,7 +35,7 @@ export async function administrator(request: FastifyRequest, reply: FastifyReply
             password
         })
     }catch(err){
-        if(err instanceof UserAlreadyExixstsError){
+        if(err instanceof UserAlreadyExistsError){
             return reply.status(409).send({message: err.message})
         }
 
