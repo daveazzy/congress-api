@@ -71,16 +71,18 @@ model Reviewer {
 }
 
 model Congress {
-  id        String   @id @default(uuid())
-  name      String
-  city      String
-  location  String
-  startDate DateTime
-  endDate   DateTime
-  createdAt DateTime @default(now()) @map("created_at")
+  id              String       @id @default(uuid())
+  name            String       @unique
+  description     String
+  knowledgeArea   String
+  city            String
+  location        String
+  startDate       DateTime
+  endDate         DateTime
+  createdAt       DateTime     @default(now()) @map("created_at")
 
-  administratorId String
   administrator   Administrator @relation("AdministratorCongress", fields: [administratorId], references: [id])
+  administratorId String
 
   checkIns    CheckIn[]    @relation("CongressCheckIns")
   submissions Submission[]
@@ -211,3 +213,4 @@ model Evaluation {
 
   @@map("evaluations")
 }
+

@@ -6,8 +6,26 @@ import fastifyJwt from "@fastify/jwt";
 
 export const app = fastify();
 
+const publicRoutes = [
+    '/administrator',
+    '/participants',
+    '/reviewer',
+    '/me'
+]
+
 app.register(fastifyJwt, {
     secret: env.JWT_SECRET
+})
+
+app.addHook('onRequest', async (request, reply) => {
+    if(!publicRoutes.some(route => request.routerPath.startsWith(route))){
+        try {
+            request.user = await request.jwtVerify();
+        } catch(err){
+            reply.status(401).send({message: 'Unauthorized'})
+        }
+    }
+    
 })
 
 app.register(appRoutes)

@@ -3,7 +3,7 @@
     install and configure Docker 'https://docs.docker.com/'
 
     1. npm install
-    2. Create a configure .env
+    2. Create and configure .env
     3. docker compose up -d
     4. npx prisma generate
     5. npx prisma migrate dev
