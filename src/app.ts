@@ -3,8 +3,15 @@ import { appRoutes } from "./http/routes";
 import { ZodError } from "zod";
 import { env } from "./env";
 import fastifyJwt from "@fastify/jwt";
+import fastifyMultipart from "fastify-multipart";
 
 export const app = fastify();
+
+app.register(fastifyMultipart, {
+    limits: {
+        fileSize: 10000000
+    }
+})
 
 const publicRoutes = [
     '/administrator',
@@ -27,6 +34,9 @@ app.addHook('onRequest', async (request, reply) => {
             reply.status(401).send({message: 'Unauthorized'})
         }
     }
+
+    console.log('Request Headers:', request.headers)
+    console.log('Request Body:', request.body)
     
 })
 
