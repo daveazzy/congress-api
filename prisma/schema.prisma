@@ -135,7 +135,7 @@ model CheckIn {
   congress    Congress    @relation("CongressCheckIns", fields: [congressId], references: [id], onDelete: Cascade)
   event       Event?      @relation("EventCheckIns", fields: [eventId], references: [id])
 
-  @@unique([participantId, congressId, eventId])
+  @@unique([participantId])
   @@map("check_ins")
 }
 
