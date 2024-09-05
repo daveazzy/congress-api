@@ -127,9 +127,9 @@ model CheckIn {
   id            String    @id @default(uuid())
   createdAt     DateTime  @default(now()) @map("created_at")
   validatedAt   DateTime? @map("validated_at")
-  participantId String
-  congressId    String
-  eventId       String?
+  participantId String    
+  congressId    String    
+  eventId       String?   
 
   participant Participant @relation("ParticipantCheckIns", fields: [participantId], references: [id], onDelete: Cascade)
   congress    Congress    @relation("CongressCheckIns", fields: [congressId], references: [id], onDelete: Cascade)

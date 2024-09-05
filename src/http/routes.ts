@@ -7,6 +7,7 @@ import { authenticateAdministrator } from "./controllers/authenticate-administra
 import { authenticateReviewer } from "./controllers/authenticate-reviewer";
 import { profile } from "./controllers/authenticated/profile";
 import { createCongress } from "./controllers/modules/create-congress";
+import { registerForCongress } from "./controllers/modules/participant-check-in";
 
 export async function appRoutes(app: FastifyInstance) {
     // register routes
@@ -23,5 +24,6 @@ export async function appRoutes(app: FastifyInstance) {
     app.get('/me', profile)
 
     app.post('/congresses', createCongress)
+    app.post('/register-for-congress', registerForCongress)
     
 }

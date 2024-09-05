@@ -10,7 +10,9 @@ const publicRoutes = [
     '/administrator',
     '/participants',
     '/reviewer',
-    '/me'
+    '/me', 
+    '/participantSessions'
+
 ]
 
 app.register(fastifyJwt, {
