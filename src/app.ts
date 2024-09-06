@@ -7,11 +7,7 @@ import fastifyMultipart from "fastify-multipart";
 
 export const app = fastify();
 
-app.register(fastifyMultipart, {
-    limits: {
-        fileSize: 10000000
-    }
-})
+app.register(fastifyMultipart)
 
 const publicRoutes = [
     '/administrator',
@@ -27,17 +23,14 @@ app.register(fastifyJwt, {
 })
 
 app.addHook('onRequest', async (request, reply) => {
-    if(!publicRoutes.some(route => request.routerPath.startsWith(route))){
+    const routeUrl = request.routeOptions?.url;
+    if (routeUrl && !publicRoutes.some(route => routeUrl.startsWith(route))) {
         try {
             request.user = await request.jwtVerify();
-        } catch(err){
-            reply.status(401).send({message: 'Unauthorized'})
+        } catch (err) {
+            reply.status(401).send({ message: 'Unauthorized' });
         }
     }
-
-    console.log('Request Headers:', request.headers)
-    console.log('Request Body:', request.body)
-    
 })
 
 app.register(appRoutes)

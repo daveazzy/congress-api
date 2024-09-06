@@ -26,9 +26,6 @@ model Participant {
 
   checkIns    CheckIn[]    @relation("ParticipantCheckIns")
   submissions Submission[]
-  works       Work[]       @relation("ParticipantWorks")
-  events      Event[]      @relation("ParticipantEvents")
-  evaluations Evaluation[] @relation("ParticipantEvaluations")
 
   @@map("participants")
 }
@@ -47,7 +44,7 @@ model Administrator {
   createdAt          DateTime @default(now()) @map("created_at")
 
   congresses Congress[]  @relation("AdministratorCongress")
-  committees Committee[] @relation("AdministratorCommittees")
+  speakers   Speaker[]   @relation("AdministratorSpeakers") // Relaciona os speakers cadastrados pelo administrador
 
   @@map("administrators")
 }
@@ -64,7 +61,6 @@ model Reviewer {
   passwordHash       String   @map("password_hash")
   createdAt          DateTime @default(now()) @map("created_at")
 
-  reviews    Review[]
   congresses Congress[] @relation("ReviewerCongress")
 
   @@map("reviewers")
@@ -86,41 +82,10 @@ model Congress {
 
   checkIns    CheckIn[]    @relation("CongressCheckIns")
   submissions Submission[]
-  events      Event[]
   reviewers   Reviewer[]   @relation("ReviewerCongress")
-  committees  Committee[]
-  works       Work[]       @relation("CongressWorks")
+  speakers    Speaker[]    @relation("CongressSpeakers") // Relaciona palestrantes ao congresso
 
   @@map("congresses")
-}
-
-model Professional {
-  id                 String   @id @default(uuid())
-  name               String
-  cpf                String   @unique
-  email              String   @unique
-  institution        String
-  city               String
-  state              String
-  academicBackground String
-  createdAt          DateTime @default(now()) @map("created_at")
-
-  committees Committee[]
-
-  @@map("professionals")
-}
-
-model Committee {
-  id              String        @id @default(uuid())
-  role            String
-  professionalId  String
-  professional    Professional  @relation(fields: [professionalId], references: [id])
-  administratorId String
-  administrator   Administrator @relation("AdministratorCommittees", fields: [administratorId], references: [id])
-  congressId      String
-  congress        Congress      @relation(fields: [congressId], references: [id])
-
-  @@map("committees")
 }
 
 model CheckIn {
@@ -133,8 +98,7 @@ model CheckIn {
 
   participant Participant @relation("ParticipantCheckIns", fields: [participantId], references: [id], onDelete: Cascade)
   congress    Congress    @relation("CongressCheckIns", fields: [congressId], references: [id], onDelete: Cascade)
-  event       Event?      @relation("EventCheckIns", fields: [eventId], references: [id])
-
+  
   @@unique([participantId])
   @@map("check_ins")
 }
@@ -150,67 +114,25 @@ model Submission {
 
   participant Participant @relation(fields: [participantId], references: [id])
   congress    Congress    @relation(fields: [congressId], references: [id])
-  reviews     Review[]
 
   @@map("submissions")
 }
 
-model Work {
-  id         String @id @default(uuid())
-  title      String
-  abstract   String
-  fileUrl    String
-  speakerId  String
-  congressId String
+model Speaker {
+  id               Int         @id @default(autoincrement())
+  name             String
+  institution      String
+  photoUri         String
+  presentationTitle String
+  date             DateTime
+  startTime        String
+  endTime          String
+  location         String
 
-  speaker  Participant @relation("ParticipantWorks", fields: [speakerId], references: [id])
-  congress Congress    @relation("CongressWorks", fields: [congressId], references: [id])
+  congressId       String
+  congress         Congress     @relation("CongressSpeakers", fields: [congressId], references: [id])
+  administratorId  String
+  administrator    Administrator @relation("AdministratorSpeakers", fields: [administratorId], references: [id])
 
-  @@map("works")
+  @@map("speakers")
 }
-
-model Event {
-  id          String   @id @default(uuid())
-  title       String
-  description String
-  date        DateTime
-  time        DateTime
-  location    String
-  congressId  String
-  speakerId   String?
-
-  congress Congress     @relation(fields: [congressId], references: [id])
-  speaker  Participant? @relation("ParticipantEvents", fields: [speakerId], references: [id])
-
-  checkIns    CheckIn[]    @relation("EventCheckIns")
-  evaluations Evaluation[] @relation("EventEvaluations")
-
-  @@map("events")
-}
-
-model Review {
-  id           String  @id @default(uuid())
-  comments     String?
-  status       String
-  submissionId String
-  reviewerId   String
-
-  submission Submission @relation(fields: [submissionId], references: [id])
-  reviewer   Reviewer   @relation(fields: [reviewerId], references: [id])
-
-  @@map("reviews")
-}
-
-model Evaluation {
-  id            String  @id @default(uuid())
-  rating        Int
-  comments      String?
-  eventId       String
-  participantId String
-
-  event       Event       @relation("EventEvaluations", fields: [eventId], references: [id], onDelete: Cascade)
-  participant Participant @relation("ParticipantEvaluations", fields: [participantId], references: [id], onDelete: Cascade)
-
-  @@map("evaluations")
-}
-

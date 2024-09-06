@@ -1,7 +1,4 @@
 import { FastifyInstance } from 'fastify';
-import FastifyMultipart from 'fastify-multipart';
-import path from 'path';
-import fs from 'fs';
 
 import { participant } from './controllers/register-participant';
 import { administrator } from './controllers/register-administrator';
@@ -12,7 +9,7 @@ import { authenticateReviewer } from './controllers/authenticate-reviewer';
 import { profile } from './controllers/authenticated/profile';
 import { createCongress } from './controllers/modules/create-congress';
 import { registerForCongress } from './controllers/modules/participant-check-in';
-import { submissionController } from './controllers/modules/submission';
+import { speaker } from './controllers/modules/register-speaker';
 
 export async function appRoutes(app: FastifyInstance) {
 
@@ -33,19 +30,5 @@ export async function appRoutes(app: FastifyInstance) {
     app.post('/congresses', createCongress);
     app.post('/register-for-congress', registerForCongress);
 
-    // Upload route
-    app.post('/congress/:congressId/submission', async (request, reply) => {
-        const data = await request.file();
-        if (!data) {
-            return reply.status(400).send({ message: "File not uploaded" });
-        }
-
-        const filePath = path.join(__dirname, './uploads', `${Date.now()}-${data.filename}`);
-        const fileStream = fs.createWriteStream(filePath);
-        data.file.pipe(fileStream);
-
-        // Optional: process additional form data from `request.fields`
-
-        return reply.status(201).send({ message: "File uploaded successfully", filePath });
-    });
+    app.post('/congresses/:congressId/speakers', speaker)
 }
