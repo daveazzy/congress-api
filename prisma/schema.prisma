@@ -44,7 +44,7 @@ model Administrator {
   createdAt          DateTime @default(now()) @map("created_at")
 
   congresses Congress[]  @relation("AdministratorCongress")
-  speakers   Speaker[]   @relation("AdministratorSpeakers") // Relaciona os speakers cadastrados pelo administrador
+  speakers   Speaker[]   @relation("AdministratorSpeakers")
 
   @@map("administrators")
 }
@@ -83,7 +83,7 @@ model Congress {
   checkIns    CheckIn[]    @relation("CongressCheckIns")
   submissions Submission[]
   reviewers   Reviewer[]   @relation("ReviewerCongress")
-  speakers    Speaker[]    @relation("CongressSpeakers") // Relaciona palestrantes ao congresso
+  speakers    Speaker[]    @relation("CongressSpeakers")
 
   @@map("congresses")
 }
@@ -93,8 +93,7 @@ model CheckIn {
   createdAt     DateTime  @default(now()) @map("created_at")
   validatedAt   DateTime? @map("validated_at")
   participantId String    
-  congressId    String    
-  eventId       String?   
+  congressId    String
 
   participant Participant @relation("ParticipantCheckIns", fields: [participantId], references: [id], onDelete: Cascade)
   congress    Congress    @relation("CongressCheckIns", fields: [congressId], references: [id], onDelete: Cascade)
