@@ -10,7 +10,8 @@ interface speakerUseCaseRequest {
     endTime: string,
     location: string, 
     congressId: string,
-    administratorId: string
+    administratorId: string,
+    categoryId: string
 }
 
 export class SpeakerUseCase {
@@ -26,7 +27,8 @@ export class SpeakerUseCase {
         endTime,
         location,
         congressId,
-        administratorId
+        administratorId,
+        categoryId
     }: speakerUseCaseRequest){
         const speaker = await this.speakerRepository.create({
             name,
@@ -38,7 +40,8 @@ export class SpeakerUseCase {
             endTime,
             location,
             congress: {connect:{id: congressId}},
-            administrator: {connect: {id: administratorId}}
+            administrator: {connect: {id: administratorId}},
+            category: {connect:{id: categoryId}}
         })
 
         return speaker

@@ -31,6 +31,7 @@ export async function speaker(request: FastifyRequest<{ Params: SpeakerParams }>
             startTime: z.string(),
             endTime: z.string(),
             location: z.string(),
+            categoryId: z.string()
         });
 
         let photoUri: string | undefined;
@@ -66,7 +67,7 @@ export async function speaker(request: FastifyRequest<{ Params: SpeakerParams }>
             }
         }
 
-        const { name, institution, presentationTitle, date, startTime, endTime, location } = speakerBodySchema.parse(formData);
+        const { name, institution, presentationTitle, date, startTime, endTime, location, categoryId } = speakerBodySchema.parse(formData);
 
         if (!photoUri) {
             return reply.status(400).send({ error: 'File upload is required' });
@@ -83,7 +84,8 @@ export async function speaker(request: FastifyRequest<{ Params: SpeakerParams }>
             endTime,
             location,
             congressId,
-            administratorId
+            administratorId,
+            categoryId
         });
 
         return reply.status(201).send();

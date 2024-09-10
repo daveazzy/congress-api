@@ -117,21 +117,32 @@ model Submission {
   @@map("submissions")
 }
 
-model Speaker {
-  id               Int         @id @default(autoincrement())
-  name             String
-  institution      String
-  photoUri         String
-  presentationTitle String
-  date             DateTime
-  startTime        String
-  endTime          String
-  location         String
+model Category {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  speakers  Speaker[] @relation("SpeakerCategory")
 
-  congressId       String
-  congress         Congress     @relation("CongressSpeakers", fields: [congressId], references: [id])
-  administratorId  String
-  administrator    Administrator @relation("AdministratorSpeakers", fields: [administratorId], references: [id])
+  @@map("categories")
+}
+
+model Speaker {
+  id                Int         @id @default(autoincrement())
+  name              String
+  institution       String
+  photoUri          String
+  presentationTitle String
+  date              DateTime
+  startTime         String
+  endTime           String
+  location          String
+
+  congressId        String
+  congress          Congress     @relation("CongressSpeakers", fields: [congressId], references: [id])
+  administratorId   String
+  administrator     Administrator @relation("AdministratorSpeakers", fields: [administratorId], references: [id])
+
+  categoryId        String
+  category          Category     @relation("SpeakerCategory", fields: [categoryId], references: [id])
 
   @@map("speakers")
 }
