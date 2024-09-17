@@ -1,4 +1,4 @@
-import { CheckIn } from "@prisma/client"
+import { Registration } from "@prisma/client"
 import { CheckInRepository } from "./repositories/participant-check-in-repository"
 import { ParticipantsRepository } from "@/repositories/participants-repository"
 import { CongressRepository } from "./repositories/congress-repository"
@@ -9,7 +9,7 @@ interface RegisterForCongressUseCaseRequest{
 }
 
 interface RegisterForCongressUseCaseResponse {
-    checkIn: CheckIn
+    checkIn: Registration
 }
 
 export class RegisterForCongressUseCase {

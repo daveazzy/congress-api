@@ -24,8 +24,9 @@ model Participant {
   passwordHash       String   @map("password_hash")
   createdAt          DateTime @default(now()) @map("created_at")
 
-  checkIns    CheckIn[]    @relation("ParticipantCheckIns")
-  submissions Submission[]
+  registrations Registration[] @relation("ParticipantRegistrations")
+  accreditations Accreditation[]
+  submissions    Submission[]
 
   @@map("participants")
 }
@@ -67,39 +68,41 @@ model Reviewer {
 }
 
 model Congress {
-  id              String       @id @default(uuid())
-  name            String       @unique
+  id              String          @id @default(uuid())
+  name            String          @unique
   description     String
   knowledgeArea   String
   city            String
   location        String
   startDate       DateTime
   endDate         DateTime
-  createdAt       DateTime     @default(now()) @map("created_at")
+  createdAt       DateTime        @default(now()) @map("created_at")
 
-  administrator   Administrator @relation("AdministratorCongress", fields: [administratorId], references: [id])
+  administrator   Administrator   @relation("AdministratorCongress", fields: [administratorId], references: [id])
   administratorId String
 
-  checkIns    CheckIn[]    @relation("CongressCheckIns")
-  submissions Submission[]
-  reviewers   Reviewer[]   @relation("ReviewerCongress")
-  speakers    Speaker[]    @relation("CongressSpeakers")
+  registrations Registration[]    @relation("CongressRegistrations")
+  accreditations Accreditation[] 
+  submissions    Submission[]
+  reviewers      Reviewer[]       @relation("ReviewerCongress")
+  speakers       Speaker[]        @relation("CongressSpeakers")
 
   @@map("congresses")
 }
 
-model CheckIn {
+
+model Registration {
   id            String    @id @default(uuid())
   createdAt     DateTime  @default(now()) @map("created_at")
   validatedAt   DateTime? @map("validated_at")
   participantId String    
   congressId    String
 
-  participant Participant @relation("ParticipantCheckIns", fields: [participantId], references: [id], onDelete: Cascade)
-  congress    Congress    @relation("CongressCheckIns", fields: [congressId], references: [id], onDelete: Cascade)
+  participant Participant @relation("ParticipantRegistrations", fields: [participantId], references: [id], onDelete: Cascade)
+  congress    Congress    @relation("CongressRegistrations", fields: [congressId], references: [id], onDelete: Cascade)
   
-  @@unique([participantId])
-  @@map("check_ins")
+  @@unique([participantId, congressId])
+  @@map("registrations") 
 }
 
 model Submission {
@@ -145,4 +148,21 @@ model Speaker {
   category          Category     @relation("SpeakerCategory", fields: [categoryId], references: [id])
 
   @@map("speakers")
+}
+model Accreditation {
+  id            String    @id @default(uuid())
+  createdAt     DateTime  @default(now()) @map("created_at")
+  validatedAt   DateTime? @map("validated_at") 
+  validatedBy   String?  
+  paymentType   String    
+  isValid       Boolean   @default(false) 
+  qrCodeToken   String? 
+  participantId String
+  congressId    String
+
+  participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  congress      Congress    @relation(fields: [congressId], references: [id], onDelete: Cascade)
+  
+  @@unique([participantId, congressId])
+  @@map("accreditations")
 }

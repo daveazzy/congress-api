@@ -1,7 +1,7 @@
-import { CheckIn, Prisma } from "@prisma/client";
+import { Registration, Prisma } from "@prisma/client";
 
 export interface CheckInRepository {
-    create(data: Prisma.CheckInCreateInput): Promise <CheckIn>
+    create(data: Prisma.RegistrationCreateInput): Promise <Registration>
 
-    findByParticipantId(participantId: string, congressId: string, eventId: string): Promise<CheckIn | null>
+    findByParticipantId(participantId: string, congressId: string, eventId: string): Promise<Registration | null>
 }
