@@ -25,6 +25,7 @@ export class InMemoryReviewersRepository implements ReviewerRepository {
             state: data.state ?? null,
             academicBackground: data.academicBackground ?? null,
             passwordHash: data.passwordHash,
+            photoUri: data.photoUri ?? null,
             createdAt: new Date(),
         }
 

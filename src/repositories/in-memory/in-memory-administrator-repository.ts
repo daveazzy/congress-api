@@ -26,6 +26,7 @@ export class InMemoryAdministratorsRepository implements AdministratorRepository
             academicBackground: data.academicBackground ?? null,
             jobTitle: data.jobTitle ?? null,
             passwordHash: data.passwordHash,
+            photoUri: data.photoUri ?? null,
             createdAt: new Date(),
         }
 

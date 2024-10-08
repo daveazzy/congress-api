@@ -11,6 +11,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Participant {
@@ -23,10 +24,13 @@ model Participant {
   academicBackground String?
   passwordHash       String   @map("password_hash")
   createdAt          DateTime @default(now()) @map("created_at")
+  qrCodeToken        String   @unique 
+  photoUri           String?
 
   registrations Registration[] @relation("ParticipantRegistrations")
   accreditations Accreditation[]
   submissions    Submission[]
+  attendances Attendance[]
 
   @@map("participants")
 }
@@ -41,6 +45,7 @@ model Administrator {
   state              String
   academicBackground String
   jobTitle           String
+  photoUri           String?
   passwordHash       String   @map("password_hash")
   createdAt          DateTime @default(now()) @map("created_at")
 
@@ -59,6 +64,7 @@ model Reviewer {
   city               String
   state              String
   academicBackground String
+  photoUri           String?
   passwordHash       String   @map("password_hash")
   createdAt          DateTime @default(now()) @map("created_at")
 
@@ -86,10 +92,10 @@ model Congress {
   submissions    Submission[]
   reviewers      Reviewer[]       @relation("ReviewerCongress")
   speakers       Speaker[]        @relation("CongressSpeakers")
+  events Event[]
 
   @@map("congresses")
 }
-
 
 model Registration {
   id            String    @id @default(uuid())
@@ -115,7 +121,7 @@ model Submission {
   congressId    String
 
   participant Participant @relation(fields: [participantId], references: [id])
-  congress    Congress    @relation(fields: [congressId], references: [id])
+  congress    Congress @relation(fields: [congressId], references: [id])
 
   @@map("submissions")
 }
@@ -132,7 +138,7 @@ model Speaker {
   id                Int         @id @default(autoincrement())
   name              String
   institution       String
-  photoUri          String
+  photoUri          String?
   presentationTitle String
   date              DateTime
   startTime         String
@@ -149,20 +155,54 @@ model Speaker {
 
   @@map("speakers")
 }
+
 model Accreditation {
   id            String    @id @default(uuid())
-  createdAt     DateTime  @default(now()) @map("created_at")
-  validatedAt   DateTime? @map("validated_at") 
-  validatedBy   String?  
+  createdAt     DateTime  @default(now())
+  validatedAt   DateTime? 
+  validatedBy   String?   
   paymentType   String    
   isValid       Boolean   @default(false) 
-  qrCodeToken   String? 
+  qrCodeToken   String?   // Esse campo pode ser mantido, mas não é mais necessário para a unicidade do QR code
   participantId String
   congressId    String
 
   participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
   congress      Congress    @relation(fields: [congressId], references: [id], onDelete: Cascade)
-  
+
   @@unique([participantId, congressId])
   @@map("accreditations")
 }
+
+// aqui é a tabela de presença em evento interno
+model Attendance {
+  id            String    @id @default(uuid())
+  participantId String
+  eventId       String
+  createdAt     DateTime  @default(now())
+  validatedAt   DateTime?
+  validatedBy   String?  
+
+  participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  event         Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([participantId, eventId]) 
+  @@map("attendances")
+}
+
+model Event {
+  id           String    @id @default(uuid())
+  name         String
+  location     String
+  startTime    DateTime
+  endTime      DateTime
+  congressId   String
+
+  congress     Congress   @relation(fields: [congressId], references: [id])
+
+  attendances  Attendance[]
+  
+  @@map("events")
+}
+
+

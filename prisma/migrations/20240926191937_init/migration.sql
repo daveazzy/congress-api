@@ -63,14 +63,14 @@ CREATE TABLE "congresses" (
 );
 
 -- CreateTable
-CREATE TABLE "check_ins" (
+CREATE TABLE "registrations" (
     "id" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "validated_at" TIMESTAMP(3),
     "participantId" TEXT NOT NULL,
     "congressId" TEXT NOT NULL,
 
-    CONSTRAINT "check_ins_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "registrations_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -113,6 +113,21 @@ CREATE TABLE "speakers" (
 );
 
 -- CreateTable
+CREATE TABLE "accreditations" (
+    "id" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "validated_at" TIMESTAMP(3),
+    "validatedBy" TEXT,
+    "paymentType" TEXT NOT NULL,
+    "isValid" BOOLEAN NOT NULL DEFAULT false,
+    "qrCodeToken" TEXT,
+    "participantId" TEXT NOT NULL,
+    "congressId" TEXT NOT NULL,
+
+    CONSTRAINT "accreditations_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "_ReviewerCongress" (
     "A" TEXT NOT NULL,
     "B" TEXT NOT NULL
@@ -140,10 +155,13 @@ CREATE UNIQUE INDEX "reviewers_email_key" ON "reviewers"("email");
 CREATE UNIQUE INDEX "congresses_name_key" ON "congresses"("name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "check_ins_participantId_key" ON "check_ins"("participantId");
+CREATE UNIQUE INDEX "registrations_participantId_congressId_key" ON "registrations"("participantId", "congressId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "categories_name_key" ON "categories"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "accreditations_participantId_congressId_key" ON "accreditations"("participantId", "congressId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_ReviewerCongress_AB_unique" ON "_ReviewerCongress"("A", "B");
@@ -155,10 +173,10 @@ CREATE INDEX "_ReviewerCongress_B_index" ON "_ReviewerCongress"("B");
 ALTER TABLE "congresses" ADD CONSTRAINT "congresses_administratorId_fkey" FOREIGN KEY ("administratorId") REFERENCES "administrators"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "check_ins" ADD CONSTRAINT "check_ins_participantId_fkey" FOREIGN KEY ("participantId") REFERENCES "participants"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "registrations" ADD CONSTRAINT "registrations_participantId_fkey" FOREIGN KEY ("participantId") REFERENCES "participants"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "check_ins" ADD CONSTRAINT "check_ins_congressId_fkey" FOREIGN KEY ("congressId") REFERENCES "congresses"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "registrations" ADD CONSTRAINT "registrations_congressId_fkey" FOREIGN KEY ("congressId") REFERENCES "congresses"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "submissions" ADD CONSTRAINT "submissions_participantId_fkey" FOREIGN KEY ("participantId") REFERENCES "participants"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -174,6 +192,12 @@ ALTER TABLE "speakers" ADD CONSTRAINT "speakers_administratorId_fkey" FOREIGN KE
 
 -- AddForeignKey
 ALTER TABLE "speakers" ADD CONSTRAINT "speakers_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "categories"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "accreditations" ADD CONSTRAINT "accreditations_participantId_fkey" FOREIGN KEY ("participantId") REFERENCES "participants"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "accreditations" ADD CONSTRAINT "accreditations_congressId_fkey" FOREIGN KEY ("congressId") REFERENCES "congresses"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_ReviewerCongress" ADD CONSTRAINT "_ReviewerCongress_A_fkey" FOREIGN KEY ("A") REFERENCES "congresses"("id") ON DELETE CASCADE ON UPDATE CASCADE;

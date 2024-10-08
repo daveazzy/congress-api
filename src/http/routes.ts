@@ -10,6 +10,7 @@ import { profile } from './controllers/authenticated/profile';
 import { createCongress } from './controllers/modules/create-congress';
 import { registerForCongress } from './controllers/modules/participant-check-in';
 import { speaker } from './controllers/modules/register-speaker';
+import { createAccreditation } from './controllers/modules/accreditation';
 
 export async function appRoutes(app: FastifyInstance) {
 
@@ -31,4 +32,7 @@ export async function appRoutes(app: FastifyInstance) {
     app.post('/register-for-congress', registerForCongress);
 
     app.post('/congresses/:congressId/speakers', speaker)
+
+    // accreditation routes
+    app.post('/congresses/:congressId/accreditations', createAccreditation);
 }

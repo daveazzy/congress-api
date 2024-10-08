@@ -23,6 +23,8 @@ export class InMemoryParticipantsRepository implements ParticipantsRepository{
             state: data.state ?? null,
             academicBackground: data.academicBackground ?? null,
             passwordHash: data.passwordHash,
+            photoUri: data.photoUri ?? null,
+            qrCodeToken: data.qrCodeToken,
             createdAt: new Date(),
         }
 
