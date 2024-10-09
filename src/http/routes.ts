@@ -11,6 +11,7 @@ import { createCongress } from './controllers/modules/create-congress';
 import { registerForCongress } from './controllers/modules/participant-check-in';
 import { speaker } from './controllers/modules/register-speaker';
 import { createAccreditation } from './controllers/modules/accreditation';
+import { registerAttendance } from './controllers/modules/attendance';
 
 export async function appRoutes(app: FastifyInstance) {
 
@@ -30,9 +31,9 @@ export async function appRoutes(app: FastifyInstance) {
     // Congress routes
     app.post('/congresses', createCongress);
     app.post('/register-for-congress', registerForCongress);
-
     app.post('/congresses/:congressId/speakers', speaker)
 
     // accreditation routes
     app.post('/congresses/:congressId/accreditations', createAccreditation);
+    app.post('/attendances/:eventId', registerAttendance);
 }
