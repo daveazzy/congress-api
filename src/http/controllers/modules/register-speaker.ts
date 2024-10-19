@@ -4,14 +4,11 @@ import { makeSpeakerUseCase } from '@/use-cases/factories/make-speakers.use-case
 import { pipeline } from 'stream';
 import { promisify } from 'util';
 import { createWriteStream, existsSync, mkdirSync } from 'fs';
-import { fileURLToPath } from 'url';
 import path from 'path';
 import { randomUUID } from 'crypto';
 
 const pump = promisify(pipeline);
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 interface SpeakerParams {
     congressId: string;
