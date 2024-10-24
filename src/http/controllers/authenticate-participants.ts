@@ -28,6 +28,7 @@ export async function authenticateParticipant(request: FastifyRequest, reply: Fa
         })
         return reply.status(200).send({
             token,
+            participant
         })
     }catch(err){
         if(err instanceof InvalidCredentialsError){
