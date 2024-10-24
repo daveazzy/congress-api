@@ -53,7 +53,7 @@ export async function speaker(request: FastifyRequest<{ Params: SpeakerParams }>
           return reply.status(500).send({ message: 'Failed to upload file' });
         }
 
-        photoUri = `${supabaseUrl}/storage/v1/object/public/your-bucket-name/speakers/${filename}`;
+        photoUri = `${supabaseUrl}/storage/v1/object/public/profile/speakers/${filename}`;
       } else if (part.fieldname) {
         if ('value' in part) {
           const value = part.value as string;
