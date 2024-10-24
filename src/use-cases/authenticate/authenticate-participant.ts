@@ -24,6 +24,7 @@ export class AuthenticateParticipantUseCase {
             throw new InvalidCredentialsError()
         }
 
+
         const doesPasswordMatches = await bcryptjs.compare(password, participant.passwordHash)
 
         if(!doesPasswordMatches){
