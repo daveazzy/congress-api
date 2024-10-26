@@ -1,39 +1,41 @@
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
+import { Prisma, Participant } from "@prisma/client";
 import { ParticipantsRepository } from "../participants-repository";
 import { validateCPF } from "@/use-cases/data-treatments/cpf-validator";
 import { InvalidCpfError } from "@/use-cases/errors/invalid-cpf";
 
-
-export class PrismaParticipantRepository implements ParticipantsRepository{
-    async findByEmail(email: string) {
-        const participant = await prisma.participant.findUnique({
-            where: {
-                email,
-            }
-        })
-
-        return participant
+export class PrismaParticipantRepository implements ParticipantsRepository {
+    async findById(id: string): Promise<Participant | null> {
+        return await prisma.participant.findUnique({
+            where: { id },
+        });
     }
 
-    async findByCPF(cpf: string){
-        const participant = await prisma.participant.findUnique({
-            where: {
-                cpf,
-            }
-        })
-
-        return participant
+    async findByEmail(email: string): Promise<Participant | null> {
+        return await prisma.participant.findUnique({
+            where: { email },
+        });
     }
-    
-    async create(data: Prisma.ParticipantCreateInput) {
-        if(data.cpf && !validateCPF(data.cpf)){
+
+    async findByCPF(cpf: string): Promise<Participant | null> {
+        return await prisma.participant.findUnique({
+            where: { cpf },
+        });
+    }
+
+    async create(data: Prisma.ParticipantCreateInput): Promise<Participant> {
+        if (data.cpf && !validateCPF(data.cpf)) {
             throw new InvalidCpfError();
         }
-        const participant = await prisma.participant.create({
+        return await prisma.participant.create({
             data,
-        })
+        });
+    }
 
-        return participant
+    async update(id: string, data: Prisma.ParticipantUpdateInput): Promise<Participant | null> {
+        return await prisma.participant.update({
+            where: { id },
+            data,
+        });
     }
 }

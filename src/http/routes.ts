@@ -12,6 +12,7 @@ import { registerForCongress } from './controllers/modules/participant-check-in'
 import { speaker } from './controllers/modules/register-speaker';
 import { createAccreditation } from './controllers/modules/accreditation';
 import { registerAttendance } from './controllers/modules/attendance';
+import { updateParticipantProfile } from './controllers/update-participant';
 
 export async function appRoutes(app: FastifyInstance) {
 
@@ -19,6 +20,8 @@ export async function appRoutes(app: FastifyInstance) {
     app.post('/participants', participant);
     app.post('/administrators', administrator);
     app.post('/reviewer', reviewer);
+
+    app.patch('/updateParticipantProfile', updateParticipantProfile);
 
     // Authenticate routes
     app.post('/participantSessions', authenticateParticipant);
