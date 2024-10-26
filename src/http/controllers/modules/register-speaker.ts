@@ -5,7 +5,7 @@ import { createClient } from '@supabase/supabase-js';
 import { randomUUID } from 'crypto';
 import { env } from '@/env';
 
-const supabaseUrl =  env.SUPABASE_URL
+const supabaseUrl = env.SUPABASE_URL;
 const supabaseKey = env.SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -27,11 +27,11 @@ export async function speaker(request: FastifyRequest<{ Params: SpeakerParams }>
       startTime: z.string(),
       endTime: z.string(),
       location: z.string(),
-      categoryId: z.string()
+      categoryId: z.string(),
     });
 
     let photoUri: string | undefined;
-    let formData: Record<string, string> = {};
+    const formData: Record<string, string> = {};
     const administratorId = request.user.sub.toString();
     const { congressId } = request.params;
 
@@ -45,14 +45,14 @@ export async function speaker(request: FastifyRequest<{ Params: SpeakerParams }>
         const { data, error } = await supabase.storage
           .from('profile')
           .upload(`speakers/${filename}`, part.file, {
-            contentType: part.mimetype 
+            contentType: part.mimetype,
+            duplex: 'half',
           });
 
         if (error) {
           console.error('Error uploading file:', error);
           return reply.status(500).send({ message: 'Failed to upload file' });
         }
-
         photoUri = `${supabaseUrl}/storage/v1/object/public/profile/speakers/${filename}`;
       } else if (part.fieldname) {
         if ('value' in part) {
@@ -80,7 +80,7 @@ export async function speaker(request: FastifyRequest<{ Params: SpeakerParams }>
       location,
       congressId,
       administratorId,
-      categoryId
+      categoryId,
     });
 
     return reply.status(201).send();
