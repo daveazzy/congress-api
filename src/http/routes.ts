@@ -13,6 +13,11 @@ import { speaker } from './controllers/modules/register-speaker';
 import { createAccreditation } from './controllers/modules/accreditation';
 import { registerAttendance } from './controllers/modules/attendance';
 import { updateParticipantProfile } from './controllers/update-participant';
+import { getSpeakers } from './controllers/modules/get-speakers';
+import { deleteParticipant } from './controllers/delete-participant';
+import { getUserEmail } from './controllers/get-email';
+import { requestPasswordReset } from './controllers/reset-participant-pass-reset';
+import { resetPassword } from './controllers/participant-reset-pass';
 
 export async function appRoutes(app: FastifyInstance) {
 
@@ -20,6 +25,13 @@ export async function appRoutes(app: FastifyInstance) {
     app.post('/participants', participant);
     app.post('/administrators', administrator);
     app.post('/reviewer', reviewer);
+
+    app.post('/password/forgot', requestPasswordReset)
+
+    app.post('/password/verify', resetPassword)
+
+    app.delete('/participants/delete/:id', deleteParticipant);
+    app.post('/participants/email', getUserEmail);
 
     app.patch('/updateParticipantProfile', updateParticipantProfile);
 
@@ -35,6 +47,8 @@ export async function appRoutes(app: FastifyInstance) {
     app.post('/congresses', createCongress);
     app.post('/register-for-congress', registerForCongress);
     app.post('/congresses/:congressId/speakers', speaker)
+
+    app.get('/speakers/:congressId', getSpeakers);
 
     // accreditation routes
     app.post('/congresses/:congressId/accreditations', createAccreditation);

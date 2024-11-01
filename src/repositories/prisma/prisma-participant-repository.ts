@@ -38,4 +38,17 @@ export class PrismaParticipantRepository implements ParticipantsRepository {
             data,
         });
     }
+
+    async delete(id: string): Promise<Participant | null> {
+        return await prisma.participant.delete({
+            where: { id },
+        });
+    }
+
+    async updatePassword(id: string, newPassword: string): Promise<Participant | null> {
+        return await prisma.participant.update({
+            where: { id },
+            data: { passwordHash: newPassword },
+        });
+    }
 }

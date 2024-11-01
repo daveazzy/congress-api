@@ -22,42 +22,42 @@ export async function updateParticipantProfile(request: FastifyRequest, reply: F
     const parsedBody: Record<string, string> = {};
 
     if (request.isMultipart()) {
+        console.log("Requisição multipart detectada");
         for await (const part of request.parts()) {
             if ((part as any).file) {
-                if (part.fieldname === "photoUri") {
+                if ((part as any).fieldname === "photoUri") {
+                    console.log("Processando imagem");
                     const id = String(request.user?.sub);
                     if (!id) {
                         return reply.status(401).send({ message: "Acesso não autorizado" });
                     }
-
-                    // Busca o perfil atual do usuário
+    
                     const currentParticipant = await prisma.participant.findUnique({
                         where: { id },
                         select: { photoUri: true },
                     });
-
-                    // Exclui a imagem antiga, se existir
+    
                     if (currentParticipant?.photoUri) {
-                        const oldPath = currentParticipant.photoUri.replace(`${supabaseUrl}/storage/v1/object/public/profile/participants/`, "");
-                        console.log("Tentando excluir a imagem antiga:", oldPath); // Log para verificar o caminho
-
+                        const oldPath = currentParticipant.photoUri.replace(
+                            `${supabaseUrl}/storage/v1/object/public/profile/participants/`,
+                            ""
+                        );
                         const { error: deleteError } = await supabase.storage.from("profile").remove([oldPath]);
-
+    
                         if (deleteError) {
                             console.error("Erro ao excluir a imagem antiga:", deleteError);
                             return reply.status(500).send({ message: "Falha ao excluir a imagem antiga", error: deleteError.message });
                         }
                     }
-
-                    // Upload da nova imagem
-                    const filename = `${Date.now()}-${part.filename}`;
+    
+                    const filename = `${Date.now()}-${(part as any).filename}`;
                     const { data, error } = await supabase.storage
                         .from("profile")
                         .upload(`participants/${filename}`, (part as any).file, {
-                            contentType: part.mimetype,
-                            duplex: 'half'
+                            contentType: (part as any).mimetype,
+                            duplex: "half",
                         });
-
+    
                     if (error) {
                         console.error("Erro ao fazer upload do arquivo:", error);
                         return reply.status(500).send({ message: "Falha ao fazer upload do arquivo" });
@@ -65,23 +65,26 @@ export async function updateParticipantProfile(request: FastifyRequest, reply: F
                     photoUri = `${supabaseUrl}/storage/v1/object/public/profile/participants/${filename}`;
                 }
             } else {
-                parsedBody[part.fieldname] = part.filepath;
+                parsedBody[(part as any).fieldname] = (part as any).value;
             }
         }
     } else {
+        console.error("A requisição não é multipart");
         return reply.status(400).send({ message: "A requisição não é multipart" });
     }
-
+    
+    console.log("Dados para atualização:", parsedBody, "URL da foto:", photoUri);
+    
     try {
         const validatedData = updateBodySchema.parse(parsedBody);
         const id = String(request.user?.sub);
         if (!id) {
             return reply.status(401).send({ message: "Acesso não autorizado" });
         }
-
+    
         const updateParticipantUseCase = makeParticipantUpdateUseCase();
         await updateParticipantUseCase.handle({
-            id: id, // Certifique-se de usar 'userId' se esta é a chave esperada
+            id: id,
             ...validatedData,
             photoUri: photoUri,
         });
@@ -92,6 +95,10 @@ export async function updateParticipantProfile(request: FastifyRequest, reply: F
             error: (err as Error).message,
         });
     }
-
+    
     return reply.status(200).send({ message: "Perfil atualizado com sucesso" });
+    
+    
+    
+    
 }

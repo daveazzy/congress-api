@@ -6,7 +6,8 @@ const envSchema = z.object({
     JWT_SECRET: z.string(),
     PORT: z.coerce.number().default(3333),
     SUPABASE_URL: z.string(),
-    SUPABASE_ANON_KEY: z.string()
+    SUPABASE_ANON_KEY: z.string(),
+    MAIL_PASSWORD: z.string()
 })
 
 const _env = envSchema.safeParse(process.env)
