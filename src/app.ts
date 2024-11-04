@@ -15,7 +15,12 @@ const publicRoutes = [
     '/reviewer',
     '/me', 
     '/participantSessions',
-    '/password/forgot'
+    '/password/forgot',
+    '/password/verify',
+    '/participants/delete/:id',
+    '/speakers/:congressId',
+    '/congresses/:congressId/accreditations',
+    '/attendances/:eventId',
 ]
 
 app.register(fastifyJwt, {

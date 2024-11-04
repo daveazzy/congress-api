@@ -2,15 +2,15 @@ import { env } from '@/env';
 import nodemailer from 'nodemailer';
 
 export const transporter = nodemailer.createTransport({
-  host: "mail.redepdimat.org", // Verifique se este é o host correto
-  port: 465, // Use 465 se estiver usando SSL, ou 587 para STARTTLS
-  secure: true, // true para SSL, false para STARTTLS (usando porta 587)
+  host: "mail.redepdimat.org", // Host do servidor de e-mail
+  port: 465, // Porta para conexão segura
+  secure: true, // Indica que a conexão deve ser segura (SSL)
   auth: {
-    user: 'noreply@redepdimat.org',
-    pass: env.MAIL_PASSWORD, // Certifique-se de que a senha está correta
+    user: 'noreply@redepdimat.org', // Usuário de autenticação
+    pass: env.MAIL_PASSWORD, // Senha armazenada em variáveis de ambiente
   },
-  logger: true,
-  debug: true, // Habilita logs de depuração para mais informações
+  logger: true, // Ativa log para depuração
+  debug: true, // Habilita logs de depuração adicionais
 });
 
 // Verificação de conexão
@@ -21,3 +21,5 @@ transporter.verify((error, success) => {
     console.log('Transportador está pronto para enviar e-mails.');
   }
 });
+
+
