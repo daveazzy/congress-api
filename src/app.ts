@@ -20,7 +20,8 @@ const publicRoutes = [
     '/participants/delete/:id',
     '/speakers/:congressId',
     '/congresses/:congressId/accreditations',
-    '/attendances/:eventId',
+    '/attendance/event/:eventId',
+    '/attendance/speaker/:speakerId',
 ]
 
 app.register(fastifyJwt, {

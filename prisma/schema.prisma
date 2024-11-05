@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,7 +8,6 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
 }
 
 model Participant {
@@ -152,6 +148,8 @@ model Speaker {
 
   categoryId        String
   category          Category     @relation("SpeakerCategory", fields: [categoryId], references: [id])
+  
+  attendances       Attendance[] @relation("SpeakerAttendances")
 
   @@map("speakers")
 }
@@ -163,7 +161,7 @@ model Accreditation {
   validatedBy   String?   
   paymentType   String    
   isValid       Boolean   @default(false) 
-  qrCodeToken   String?   // Esse campo pode ser mantido, mas não é mais necessário para a unicidade do QR code
+  qrCodeToken   String?   
   participantId String
   congressId    String
 
@@ -174,19 +172,24 @@ model Accreditation {
   @@map("accreditations")
 }
 
-// aqui é a tabela de presença em evento interno
 model Attendance {
   id            String    @id @default(uuid())
   participantId String
-  eventId       String
   createdAt     DateTime  @default(now())
   validatedAt   DateTime?
   validatedBy   String?  
 
-  participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
-  event         Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  // Campos para relação polimórfica
+  eventId       String?
+  speakerId     Int?
+  type          String    // Pode ser 'EVENT' ou 'SPEAKER'
 
-  @@unique([participantId, eventId]) 
+  participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  event         Event?      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  speaker       Speaker?    @relation("SpeakerAttendances", fields: [speakerId], references: [id], onDelete: Cascade)
+
+  @@unique([participantId, eventId], name: "participant_event")
+  @@unique([participantId, speakerId], name: "participant_speaker")
   @@map("attendances")
 }
 
@@ -204,5 +207,3 @@ model Event {
   
   @@map("events")
 }
-
-

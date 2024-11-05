@@ -52,5 +52,14 @@ export async function appRoutes(app: FastifyInstance) {
 
     // accreditation routes
     app.post('/congresses/:congressId/accreditations', createAccreditation);
-    app.post('/attendances/:eventId', registerAttendance);
+    app.post(
+        '/attendance/event/:eventId',
+        registerAttendance
+      );
+    
+      // Rota para registrar presença em palestra
+      app.post(
+        '/attendance/speaker/:speakerId',
+        registerAttendance
+      );
 }

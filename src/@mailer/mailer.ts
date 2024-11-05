@@ -9,8 +9,8 @@ export const transporter = nodemailer.createTransport({
     user: 'noreply@redepdimat.org', // Usuário de autenticação
     pass: env.MAIL_PASSWORD, // Senha armazenada em variáveis de ambiente
   },
-  logger: true, // Ativa log para depuração
-  debug: true, // Habilita logs de depuração adicionais
+  // logger: true, // Ativa log para depuração
+  // debug: true, // Habilita logs de depuração adicionais
 });
 
 // Verificação de conexão

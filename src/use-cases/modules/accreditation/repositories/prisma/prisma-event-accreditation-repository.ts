@@ -5,18 +5,33 @@ import { prisma } from "@/lib/prisma";
 export class PrismaAttendanceRepository implements EventAccreditationRepository {
     async create(data: Prisma.AttendanceCreateInput): Promise<Attendance> {
         try {
-            const existingAttendance = await prisma.attendance.findUnique({
-                where: {
-                    participantId_eventId: {
-                        participantId: data.participant.connect?.id || "",
-                        eventId: data.event.connect?.id || "",
+            // Verifica se é presença em evento ou palestra
+            if (data.type === 'EVENT') {
+                const existingEventAttendance = await prisma.attendance.findFirst({
+                    where: {
+                        participantId: data.participant.connect?.id,
+                        eventId: data.event?.connect?.id,
+                        type: 'EVENT'
                     },
-                },
-            });
+                });
 
-            if (existingAttendance) {
-                throw new Error("Este participante já registrou presença para este evento.");
+                if (existingEventAttendance) {
+                    throw new Error("Este participante já registrou presença para este evento.");
+                }
+            } else if (data.type === 'SPEAKER') {
+                const existingSpeakerAttendance = await prisma.attendance.findFirst({
+                    where: {
+                        participantId: data.participant.connect?.id,
+                        speakerId: data.speaker?.connect?.id,
+                        type: 'SPEAKER'
+                    },
+                });
+
+                if (existingSpeakerAttendance) {
+                    throw new Error("Este participante já registrou presença para esta palestra.");
+                }
             }
+
             const attendance = await prisma.attendance.create({
                 data,
             });
@@ -24,17 +39,29 @@ export class PrismaAttendanceRepository implements EventAccreditationRepository 
             return attendance;
         } catch (error) {
             console.error("Erro ao criar registro de presença:", error);
+            if (error instanceof Error) {
+                throw error; // Re-throw se for um erro conhecido
+            }
             throw new Error("Não foi possível criar o registro de presença.");
         }
     }
 
     async findByParticipantAndEvent(participantId: string, eventId: string): Promise<Attendance | null> {
-        return prisma.attendance.findUnique({
+        return prisma.attendance.findFirst({
             where: {
-                participantId_eventId: {
-                    participantId,
-                    eventId,
-                },
+                participantId,
+                eventId,
+                type: 'EVENT'
+            },
+        });
+    }
+
+    async findByParticipantAndSpeaker(participantId: string, speakerId: number): Promise<Attendance | null> {
+        return prisma.attendance.findFirst({
+            where: {
+                participantId,
+                speakerId,
+                type: 'SPEAKER'
             },
         });
     }
@@ -43,8 +70,8 @@ export class PrismaAttendanceRepository implements EventAccreditationRepository 
         return prisma.attendance.update({
             where: { id: attendanceId },
             data: {
-                validatedAt: new Date(), 
-                validatedBy, 
+                validatedAt: new Date(),
+                validatedBy,
             },
         });
     }
@@ -54,6 +81,10 @@ export class PrismaAttendanceRepository implements EventAccreditationRepository 
             where: {
                 participantId,
             },
+            include: {
+                event: true,
+                speaker: true
+            }
         });
     }
 
@@ -61,9 +92,23 @@ export class PrismaAttendanceRepository implements EventAccreditationRepository 
         return prisma.attendance.findMany({
             where: {
                 eventId,
+                type: 'EVENT'
             },
+            include: {
+                participant: true
+            }
+        });
+    }
+
+    async findAllAttendancesForSpeaker(speakerId: number): Promise<Attendance[]> {
+        return prisma.attendance.findMany({
+            where: {
+                speakerId,
+                type: 'SPEAKER'
+            },
+            include: {
+                participant: true
+            }
         });
     }
 }
-
-

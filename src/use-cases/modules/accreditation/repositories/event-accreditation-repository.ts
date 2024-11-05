@@ -10,4 +10,7 @@ export interface EventAccreditationRepository {
     findAllAttendancesForParticipant(participantId: string): Promise<Attendance[]>;
     
     findAllAttendancesForEvent(eventId: string): Promise<Attendance[]>;
+
+    findByParticipantAndEvent(participantId: string, eventId: string): Promise<Attendance | null>;
+    findByParticipantAndSpeaker(participantId: string, speakerId: number): Promise<Attendance | null>;
 }
