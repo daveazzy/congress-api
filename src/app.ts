@@ -22,6 +22,7 @@ const publicRoutes = [
     '/congresses/:congressId/accreditations',
     '/attendance/event/:eventId',
     '/attendance/speaker/:speakerId',
+    '/accredited-participants/pdf'
 ]
 
 app.register(fastifyJwt, {
