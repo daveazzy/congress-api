@@ -1,50 +1,68 @@
-import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
-import { getAccreditedParticipants } from './get'; // Função para obter os participantes credenciados
+import { PDFDocument, StandardFonts, rgb, PDFPage } from 'pdf-lib';
+import { getAccreditedParticipants } from './get'; 
 
 export async function exportParticipantsToPDF() {
-  const participants = await getAccreditedParticipants(); // Busca os participantes credenciados
-  
-  // Ordena os participantes por nome
+  const participants = await getAccreditedParticipants(); 
+
   participants.sort((a, b) => a.name.localeCompare(b.name));
 
-  // Cria o documento PDF
   const pdfDoc = await PDFDocument.create();
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   
-  let page = pdfDoc.addPage([600, 750]); // Adiciona a primeira página
+  let page = pdfDoc.addPage([600, 750]); 
   page.setFont(font);
   page.setFontSize(12);
 
-  // Configura o título na primeira página
-  page.drawText('Lista de Participantes Credenciados', { x: 50, y: 700, size: 18, color: rgb(0, 0, 0.8) });
-
-  // Cabeçalhos da tabela
+  const headers = ['#', 'Nome', 'CPF', 'Institution', 'Email'];
   let yPosition = 670;
-  const headers = ['Nome', 'CPF', 'Institution', 'Email'];
-  page.drawText(headers.join('    '), { x: 50, y: yPosition, color: rgb(0, 0, 0) });
+
+  page.drawText('Particioantes aptos ao certificado', { x: 50, y: 700, size: 18, color: rgb(0, 0, 0.8) });
+
+  drawTableRow(page, headers, yPosition);
   yPosition -= 20;
 
-  // Itera sobre os participantes e os adiciona ao PDF
-  participants.forEach((participant) => {
+  participants.forEach((participant, index) => {
     const { name, cpf, institution, email } = participant;
-    const participantInfo = `${name}    ${cpf}    ${institution}    ${email}`;
-    
-    // Se a posição Y estiver abaixo do limite, cria uma nova página e reinicia a posição
+
+    const participantInfo = [
+      index + 1, 
+      name ?? 'Não informado', 
+      cpf ?? 'Não informado',
+      institution ?? 'Não informado',
+      email ?? 'Não informado'
+    ];
+
     if (yPosition < 50) {
-      page = pdfDoc.addPage([600, 750]); // Cria uma nova página
+      page = pdfDoc.addPage([600, 750]); 
       page.setFont(font);
       page.setFontSize(12);
-      yPosition = 700; // Reinicia a posição para o topo da nova página
-      page.drawText(headers.join('    '), { x: 50, y: yPosition, color: rgb(0, 0, 0) }); // Redesenha os cabeçalhos na nova página
+      yPosition = 700; 
+      drawTableRow(page, headers, yPosition); 
       yPosition -= 20;
     }
 
-    // Adiciona o texto do participante na posição atual
-    page.drawText(participantInfo, { x: 50, y: yPosition });
-    yPosition -= 20; // Ajusta a posição Y para o próximo participante
+    drawTableRow(page, participantInfo, yPosition);
+    yPosition -= 20; 
   });
 
-  // Salva o PDF e retorna o conteúdo em bytes
   const pdfBytes = await pdfDoc.save();
-  return pdfBytes; // Retorna o buffer para download
+  return pdfBytes;
+}
+
+function drawTableRow(page: PDFPage, rowData: (string | number)[], yPosition: number): void {
+  const headerWidth = 100;
+  const columnSpacing = 10;
+
+  rowData.forEach((data, index) => {
+    page.drawText(String(data), { x: 50 + index * (headerWidth + columnSpacing), y: yPosition, size: 12, color: rgb(0, 0, 0) });
+  });
+
+  page.drawRectangle({
+    x: 50,
+    y: yPosition - 15,
+    width: headerWidth * rowData.length + columnSpacing * (rowData.length - 1),
+    height: 20,
+    borderColor: rgb(0, 0, 0),
+    borderWidth: 1,
+  });
 }

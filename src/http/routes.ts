@@ -18,9 +18,7 @@ import { deleteParticipant } from './controllers/delete-participant';
 import { getUserEmail } from './controllers/get-email';
 import { requestPasswordReset } from './controllers/reset-participant-pass-reset';
 import { resetPassword } from './controllers/participant-reset-pass';
-import { exportParticipantsToSpreadsheet } from '@/credenciads/pdf';
-
-import fs from 'fs'
+import { exportParticipantsToPDF } from '@/credenciads/pdf';
 
 export async function appRoutes(app: FastifyInstance) {
 
@@ -67,15 +65,16 @@ export async function appRoutes(app: FastifyInstance) {
       );
 
 
-      app.get('/participants/excel', async (request, reply) => {
+      app.get('/participants/pdf', async (request, reply) => {
         try {
-          await exportParticipantsToSpreadsheet(); // Gera a planilha
-          reply.header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-          reply.header('Content-Disposition', 'attachment; filename="ParticipantesCredenciados.xlsx"');
-          reply.send(fs.readFileSync('ParticipantesCredenciados.xlsx')); // Envia o arquivo como resposta
-        } catch (error) {
-          reply.status(500).send("Erro ao gerar a planilha");
+          const pdfBytes = await exportParticipantsToPDF();
+          reply.header('Content-Type', 'application/pdf');
+          reply.header('Content-Disposition', 'attachment; filename="ParticipantesCredenciados.pdf"');
+          reply.send(pdfBytes);
+        } catch {
+          reply.status(500).send("Erro ao gerar PDF");
         }
       });
+      
 
 }
