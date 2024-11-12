@@ -18,6 +18,7 @@ import { deleteParticipant } from './controllers/delete-participant';
 import { getUserEmail } from './controllers/get-email';
 import { requestPasswordReset } from './controllers/reset-participant-pass-reset';
 import { resetPassword } from './controllers/participant-reset-pass';
+import { exportParticipantsToPDF } from '@/credenciads/pdf';
 
 export async function appRoutes(app: FastifyInstance) {
 
@@ -62,4 +63,21 @@ export async function appRoutes(app: FastifyInstance) {
         '/attendance/speaker/:speakerId',
         registerAttendance
       );
+
+
+      app.get('/accredited-participants/pdf', async (request, reply) => {
+        try {
+          const pdfBytes = await exportParticipantsToPDF(); // Gera o PDF
+          
+          // Configura a resposta para enviar o PDF
+          reply
+            .type('application/pdf')
+            .header('Content-Disposition', 'attachment; filename="ParticipantesCredenciados.pdf"')
+            .send(pdfBytes);
+        } catch (error) {
+          console.error("Erro ao gerar PDF:", error);
+          reply.status(500).send({ message: "Erro ao gerar PDF" });
+        }
+      });
+
 }
