@@ -65,18 +65,14 @@ export async function appRoutes(app: FastifyInstance) {
       );
 
 
-      app.get('/accredited-participants/pdf', async (request, reply) => {
+      app.get('/participants/pdf', async (request, reply) => {
         try {
-          const pdfBytes = await exportParticipantsToPDF(); // Gera o PDF
-          
-          // Configura a resposta para enviar o PDF
-          reply
-            .type('application/pdf')
-            .header('Content-Disposition', 'attachment; filename="ParticipantesCredenciados.pdf"')
-            .send(pdfBytes);
+          const pdfBytes = await exportParticipantsToPDF();
+          reply.header('Content-Type', 'application/pdf');
+          reply.header('Content-Disposition', 'attachment; filename="ParticipantesCredenciados.pdf"');
+          reply.send(pdfBytes);
         } catch (error) {
-          console.error("Erro ao gerar PDF:", error);
-          reply.status(500).send({ message: "Erro ao gerar PDF" });
+          reply.status(500).send("Erro ao gerar PDF");
         }
       });
 

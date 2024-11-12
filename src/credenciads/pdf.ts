@@ -1,8 +1,11 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
-import { getAccreditedParticipants } from './get';
+import { getAccreditedParticipants } from './get'; // Função para obter os participantes credenciados
 
 export async function exportParticipantsToPDF() {
   const participants = await getAccreditedParticipants(); // Busca os participantes credenciados
+  
+  // Ordena os participantes por nome
+  participants.sort((a, b) => a.name.localeCompare(b.name));
 
   // Cria o documento PDF
   const pdfDoc = await PDFDocument.create();
@@ -14,12 +17,17 @@ export async function exportParticipantsToPDF() {
 
   // Configura o título na primeira página
   page.drawText('Lista de Participantes Credenciados', { x: 50, y: 700, size: 18, color: rgb(0, 0, 0.8) });
-  
+
+  // Cabeçalhos da tabela
   let yPosition = 670;
+  const headers = ['Nome', 'CPF', 'Institution', 'Email'];
+  page.drawText(headers.join('    '), { x: 50, y: yPosition, color: rgb(0, 0, 0) });
+  yPosition -= 20;
 
   // Itera sobre os participantes e os adiciona ao PDF
-  participants.forEach((participant, index) => {
-    const participantInfo = `${index + 1}. Nome: ${participant.name}, Email: ${participant.email}`;
+  participants.forEach((participant) => {
+    const { name, cpf, institution, email } = participant;
+    const participantInfo = `${name}    ${cpf}    ${institution}    ${email}`;
     
     // Se a posição Y estiver abaixo do limite, cria uma nova página e reinicia a posição
     if (yPosition < 50) {
@@ -27,6 +35,8 @@ export async function exportParticipantsToPDF() {
       page.setFont(font);
       page.setFontSize(12);
       yPosition = 700; // Reinicia a posição para o topo da nova página
+      page.drawText(headers.join('    '), { x: 50, y: yPosition, color: rgb(0, 0, 0) }); // Redesenha os cabeçalhos na nova página
+      yPosition -= 20;
     }
 
     // Adiciona o texto do participante na posição atual
