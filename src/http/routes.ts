@@ -69,7 +69,7 @@ export async function appRoutes(app: FastifyInstance) {
         try {
           const pdfBytes = await exportParticipantsToPDF();
           reply.header('Content-Type', 'application/pdf');
-          reply.header('Content-Disposition', 'attachment; filename="ParticipantesCredenciados.pdf"');
+          reply.header('Content-Disposition', 'attachment; filename="Aptos_ao_certificado.pdf"');
           reply.send(pdfBytes);
         } catch {
           reply.status(500).send("Erro ao gerar PDF");
